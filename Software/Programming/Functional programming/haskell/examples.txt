@@ -1,0 +1,430 @@
+Guess the word game
+
+check word visual char
+    = (
+    char `elem` word,
+    [if char == x then x else y | (x,y) <- zip word visual]
+    )
+
+
+guess::[Char]->[Char]->Int->IO()
+
+guess word visual n
+    = if n == 0
+        then
+            putStrLn "You failed"
+        else
+            if word == visual
+                then
+                    putStrLn "You won"
+                else
+                    do
+                        putStrLn (visual ++ "  " ++ take n (repeat '*'))
+                        putStr "Enter your guess: "
+                        q <- getLine
+                        let (correct, visual') = check word visual (q!!0)
+                        let n' = if correct then n else (n-1)
+                        guess word visual' n'
+
+game::[Char]->Int->IO()
+
+game word trials
+       = guess word ['-' | x<-word] trials
+
+
+-------------------------------------------------------
+
+-- Spelling book
+
+spell :: [Char] -> Int-> [Char]
+
+spell "" _ = ""
+spell (x:xs) len | len > 0 = x : " for " ++ (x:xs) ++ ", "
+                 | otherwise = x : " for " ++ (x:xs)
+
+
+speller :: [[Char]] -> [Char]
+
+speller [] = ""
+speller (x:xs) = (spell x (length xs)) ++ (speller xs)
+
+-------------------------------------------------------
+
+-- Types examples
+
+-- declare new typed
+
+data MatchScore = Score [Char] Int Int deriving Show
+
+x = Score "Itihad" 5 6
+
+-- case statement that uses new made datetypes
+
+data Color = Red | Blue | Yellow | Green | Fading deriving Show
+
+feeling :: Color -> String
+feeling x =
+  case x of
+    Red -> "Blood"
+    Blue -> "Ocean"
+    Yellow -> "Sun"
+    Green -> "Trees”
+    _ -> "Darkness”
+
+-------------------------------------------------------
+
+-- Type classes examples
+
+-- check the required type for a Monomorphic function
+
+:type (+)
+(+) :: Num a => a -> a -> a
+
+-- declaration of a new type class
+
+class Food a where
+      raw :: a -> Bool
+      cook :: a -> a
+
+-- declaration of a type and asssigning it to the type class
+
+data Fish
+     = Tuna
+    | BlueFin
+     deriving (Read, Show)
+
+raw_fish :: Fish -> Bool
+raw_fish BlueFin  = True
+raw_fish Tuna       = False
+
+cook_fish :: Fish ->  Fish
+cook_fish BlueFin  = Tuna
+cook_fish Tuna       = Tuna
+
+instance Food Fish where
+      raw    =  raw_fish
+      cook  =  cook_fish
+
+-- binary tree data structure
+
+data BinaryTree = Leaf | Node Int BinaryTree BinaryTree deriving Show
+
+-- get the depth of a BinaryTree
+
+depth :: BinaryTree -> Int
+depth Leaf = 0
+depth (Node _ left right) =
+  1 + max (depth left) (depth right)
+
+-------------------------------------------------------
+
+-- Uncertainty
+
+-- maybe data type defination
+
+data  Maybe a  =  Nothing | Just a deriving ( Eq, Ord )
+
+-- using maybe to get a max of a list even if the list is empty
+
+maxhelper :: Int -> [Int] -> Int
+maxhelper x [] = x
+maxhelper x (y:ys)
+  | x > y = maxhelper x ys
+  | otherwise  = maxhelper y ys
+
+maxfromlist :: [Int] -> Maybe Int
+maxfromlist [] = Nothing
+maxfromlist (x:xs) = Just (maxhelper x xs)
+
+
+-------------------------------------------------------
+
+-- Text parsing
+
+-- parser defination
+
+type Parser a = String -> [(a, String)]
+
+-- digit parser
+
+parse digit "123"      //the digit parser gets only a digit (and from our case the parser got a character from the beginning of a the string).
+[("1", "23")]
+
+-- using some to apply parser to whole string
+
+parse (some digit) "123"
+
+-- using <|> operator to apply parser on multiple choises
+
+parse (digit <|> letter) "123"
+
+-- natural numbers parser
+
+nat =
+  do
+    x <- some digit
+    return (read xs)
+
+to match Integers
+
+-- integers parser
+
+int =
+  do
+    char '-'
+    n <- nat
+    return (-n)
+  <|>
+    nat
+
+-------------------------------------------------------
+
+-- Testing our code (Unit testing)
+
+-- importing QuickCheck
+
+Using QuickCheck
+import Test.QuickCheck
+
+-- using QuicjCheck to check if the first element of the list is the minimum
+
+import Data.List
+quickCheck ((\l->(if l==[] then True else (minimum l) == (sort l)!!0))::[Int]->Bool)
+
+-- using verboseCheck to get all the details
+
+verboseCheck ((\l->(if l==[] then True else (minimum l) == (sort l)!!0))::[Int]->Bool)
+
+-------------------------------------------------------
+
+-- Lambda functions
+
+-- example of expression using lambda and without using lambda
+
+-- with lambda
+(-b) + sqrt (b^2 - 4*a*c)
+
+-- without Lambda
+e1 = (-b)
+e2 = b^2
+e3 = 4*a
+e4 = e3*c
+e5 = e2-e4
+e6 = e1+e5
+
+-------------------------------------------------------
+
+-- Returning Every thing to lambda
+
+-- let in expression
+
+let
+   n = 10
+   f x = x+1
+ in
+   f n
+
+-- One variable per let
+
+ let
+   n = 10
+ in
+   let
+     f x = x+1
+   in
+     f n
+
+-- Rewrite f as lambda
+
+ let
+   n = 10
+ in
+   let
+     f = \x -> x+1
+   in
+     f n
+
+
+-- Rewrite inner let as lambda
+
+ let
+   n = 10
+ in
+   (\f -> f n) (\x -> x+1)
+
+-- Rewrite outer let as lambda
+
+ ( \n -> ((\f -> f n) ( \x -> x+1 )) ) 10
+
+
+-- if then else expression
+
+-- defining true and false as functions
+
+true = \x y -> x
+false = \x y -> y
+
+-- now for the if then else usual shape
+
+if cond then if_true_exp else if_false_exp
+
+ifthenelse cond if_true_exp if_false_exp = cond if_true_exp if_false_exp
+
+-- then
+
+cond if_true_exp if_false_exp
+
+-- so now we have
+
+true if_true_exp if_false_exp
+-- and
+false if_true_exp if_false_exp
+
+-- and in lambda form
+
+(\x y -> x) if_true_exp if_false_exp
+-- and
+(\x y -> y) if_true_exp if_false_exp
+
+
+-------------------------------------------------------
+
+-- Monads
+
+-- using the >>= operator vs using the do notation
+
+-- using >>=
+eval1 x >>= (\n ->
+eval2 n >>= (\m ->
+doSomething m >>= (\i ->
+return i)))
+
+-- using do
+do
+  n <- eval1 x
+  m <- eval2 n
+  i <- doSomething m
+  return i
+
+-- Monad type class defination
+
+class Monad m where
+    return :: a -> m a
+    (>>=) :: m a -> (a -> m b) -> m b
+    (>>)   :: m a -> m b -> m b
+    fail   :: String -> m a
+
+-- Maybe monad instance
+
+import Control.Monad
+
+instance Monad Maybe where
+   return         =   Just
+   Nothing  >>= f = Nothing
+   (Just x) >>= f = f x
+   fail _         =   Nothing
+
+
+-- operation needs maybe monad but doesn't use it on a function that gets the third element of an array
+
+fun :: [a] -> Maybe a
+fun xs =
+  case myTail xs of
+    Nothing -> Nothing
+    Just a -> case myTail a of
+                Nothing -> Nothing
+                Just b -> myHead b
+
+-- using the >>= operator vs using the do notation on the same previous example
+
+-- using >>=
+fun :: [a] -> Maybe a
+fun xs =
+  myTail xs >>=
+    (\a -> myTail a >>=
+      (\b -> myHead b))
+
+
+-- using the do motation
+fun :: [a] -> Maybe a
+fun xs = do
+  a <- myTail xs
+  b <- myTail a
+  myHead b
+
+
+-- Trace the use of fun on this list [5, 6, 7] using the >>= method and the do notation for each step
+
+-- substitute [5,6,7] for xs in definition of fun
+
+-- >>= method
+myTail [5,6,7] >>=
+ (\a -> myTail a >>=
+  (\b -> myHead b))
+
+-- do method
+a <- myTail [5,6,7]
+b <- myTail a
+myHead b
+
+-- def. myTail
+
+-- >>= method
+Just [6,7]  >>=
+ (\a -> myTail a >>=
+  (\b -> myHead b))
+
+-- do method
+a <- Just [6,7]
+b <- myTail a
+myHead b
+
+--  def.2 of (>>=)
+
+-- >>= method
+(\a -> myTail a >>=
+(\b -> myHead b))
+  [6,7]
+
+-- do method
+b <- myTail [6, 7]
+myHead b
+
+-- beta reduction, substitute [6,7] for a
+
+-- >>= method
+ myTail [6,7] >>= (\b -> myHead b)
+
+-- do method
+ b <- myTail [6, 7]
+ myHead b
+
+-- reduce myTail
+
+-- >>= method
+ Just [7] >>=  (\b -> myHead b)
+
+-- do method
+ b <- Just [7]
+ myHead b
+
+--  def.2 of (>>=)
+
+-- >>= method
+(\b -> myHead b) [7]
+
+-- do method
+ myHead [7]
+
+-- beta reduction, substitute [7] for b
+
+-- >>= method
+myHead [7]
+
+-- do method
+myHead [7]
+
+-- def myHead
+
+-- both methods
+Just 7

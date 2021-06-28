@@ -1,0 +1,1925 @@
+Haskell
+
+no statements, only expressions!
+
+all computation is performed by evaluating expressions
+
+An expression evaluates to a result
+
+Parentheses are for grouping
+
+In Haskell, variables are immutable, you can't assign them more than once
+
+Haskell interprets "abs -6" as "abs - 6" and abs requires a numerical argument. The correct expression is abs (-6).
+
+
+*Function applications*
+
+Expressions can contain function calls.
+
+in Functions with several arguments The arguments are given after the function, separated by whitespace
+
+If an argument to a function is an expression, you’ll need to put it in parentheses.
+
+So f x + 3 means (f x) + 3 and not f (x+3)
+
+type "hello world"    ->    "hello world" :: [Char]
+
+
+*Equations*
+
+Equations give names to values
+
+The left hand side should be a name that you’re giving a value to.
+
+Correct: x = 5*y
+Incorrect: 2 * x = (3*x)**2 – Reassignment is not allowed in a pure FPL
+
+Equations are not assignments
+
+In Haskell variables are constant! so Once you give a value to a name, you can never change it!
+
+In Haskell, it is valid to write n = n + 1.
+This is an equation, not an assignment!
+
+It means: compute the value of n that has the property that n = n + 1.
+Haskell will try, and it will fail. Haskell will fail to compute the result due to the recursive definition
+
+Anything with an "=" sign is an equation, effectively.
+
+
+
+*How can you compute without assignments?*
+
+    Think of an assignment statement as doing three things:
+        It evaluates the right hand side: computing a useful value.
+        It discards the value of the variable on the left hand side: destroying a value that might or might not be useful.
+        It saves the useful value of the right hand side into the variable.
+    In a pure functional language
+        We never destroy old values.
+    We just compute new useful ones.
+    If the old value was truly useless, the garbage collector will reclaim its storage.
+
+
+--------------------------------------------------------------------
+
+*Blocks*
+
+roots a b c =
+        let
+            det2 = b*b-4*a*c;
+            det  = sqrt(det2);
+            rootp = (-b + det)/a/2;
+            rootm = (-b - det)/a/2;
+        in
+            [rootm,rootp]
+
+
+
+*Conditions*
+
+    max x y =
+        if x > y
+            then x
+            else y
+
+
+*lambda functions*
+
+f = \x y -> x*x+y*y
+
+
+*high order functions*
+
+Higher Order Functions are a unique feature of Haskell where you can use a function as an input or output argument.
+map is a hight order function
+
+map (\x->2*x) [1..10]
+
+
+*Case statement*
+
+    data Color = Red | Blue | Yellow
+
+    color = set_color
+    action = case color of
+        Red -> action1
+        Blue -> action2
+        Yellow -> action3
+
+Note however how we use the type as the value to decide on the case, where in other languages we need to define some kind of enumeration.
+
+
+*Generics/Templates*
+
+java
+    Map<String,Integer> set = new HashMap<String,Integer>();
+
+    set.put("Answer",42)
+
+
+Haskell
+        Defination, map to these datatypes
+           (  | |  ) |     |      |
+              * *    *     *      *
+    set :: Data.Map.Map String Integer
+        Defination, make empty version named set
+           (  | |  ) |
+              * *    *
+    set = Data.Map.empty
+        Defination, clone  new  values to set template we made eariler to set'
+           (  | |  ) |          |    |  |
+              * *    *          *    *  *
+    set' = Data.Map.insert "Answer" 42 set
+
+
+Because in Haskell variables are immutable, the return value of the insert call is bound to a new variable (set') rather than updating the variable in place as in Java.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+*Reduction*
+
+Reduction is the process of converting an expression to a simpler form. Conceptually, an expression is reduced by simplifying one reducible expression (called “redex”) at a time. Each step is called a reduction
+
+When a reduction is performed, there is only one possible answer, the computation has only one possible path when each step the current contains only one redex.
+
+If an expression contains several redexes, there will be several reduction paths.
+
+Every terminating reduction path gives the same result
+
+This means that
+
+    Correctness doesn’t depend on order of evaluation but performance does.
+
+    The compiler (or programmer) can change the order freely to improve performance, without affecting the result.
+    Different expressions can be evaluated in parallel, without affecting the result. As a result, functional languages are leading contenders for programming future parallel systems.
+
+
+
+*Functions*
+
+A function is defined by an equation.
+
+f = \x -> x+1  -- lambda function
+-- or
+f x = x+1 -- named function
+
+
+The left hand side of the equation looks like a variable – and that’s what it is
+The right hand side is an expression that uses the local variables listed in parentheses and defines the result of the expression.
+
+
+The left hand side gives the name of the function;
+The right hand side (the “body”) is an expression giving the formal parameters, and the value of the application. The expression may use the parameters.
+
+A function with three arguments:
+add3nums = \x y z -> x + y + z
+
+difference between a named function and a lambda function assigned to a variable?
+they are the same, but if you are about to use the same functions more than once probably you should use a named function.
+
+A function takes one or more arguments and computes a result.
+Given the same arguments, the result will always be the same. In Haskell there are no side-effects.
+
+
+*Lists*
+
+A list is a single value that contains several other values.
+lists allow you to package up several values into one object, which can be returned by a function
+
+minmax = \x y -> [min x y, max x y]
+minmax 9 8  -- > [8,9]
+
+The elements are evaluated lazily, But as long as you do not access the expression, it is not evaluated (which is good some times).
+
+Append: the (++) operator
+[23, 29] ++ [48, 41, 44] -- > [23, 29, 48, 41, 44]
+Operator ":" does the same
+23 : [48, 41, 44] -- > [23,48,41,44]
+
+Sequences:
+[0 .. 5] -- > [0,1,2,3,4,5]
+[’a’ .. ’e’] -- > [’a’,’b’,’c’,’d’,’e’]
+[2,4 .. 16] -- > [2,4,6,8,10,12,14,16]
+['a','d' .. 'z'] -- > ['a','d','g','j','m','p','s','v','y']
+
+
+list comprehensions:
+[2*x + 1 | x <- [0..10]]
+-- >
+[1,3,5,7,9,11,13,15,17,19,21]
+
+[[a,b] | a <- [10,11,12] , b <- [20,21]]
+-- >
+[[10,20],[10,21],[11,20],[11,21],[12,20],[12,21]]
+
+Indexing a list:
+[5,3,8,7]  !! 2    -- > 8
+['a'..'z'] !! 13  -- > 'n'
+
+To get the length of a list you can use the length function: length ["A","list","of","strings"].
+
+Note: For robust programming, we need to ensure either that all expressions are well defined, or else that all exceptions are caught and handled.
+
+for example if there is an exprestion inside a list and that expresion will cause an error, this error will not appear till run time (becuse of the lazy programming)
+
+Haskell is “lazy”, meaning that it only evaluates expressions when they are required for the evaluation of another expression
+
+Head and tail:
+
+mane takes and returns|
+ |    |               |
+head [] :: Int <-------
+tail [] :: [Int]
+
+-----------------------------------------------
+
+WEEK 2
+
+
+
+
+The not-equals operator
+
+Use the /= operator (it's supposed to look like an equals sign with a line through it), to test for inequality, e.g. 1 /= 2.
+
+
+Haskell cannot compare two values that have different types. The full story is more complex, but for now, we can see that types limit the operations we can apply to particular values.
+
+Haskell supports the standard comparison/relational operators, <, <=, >, >=. Try a simple comparison, e.g. 10 > 9
+
+
+Note that relational operators also work on lists, in a dictionary-order manner (lexicographic). e.g. Try [1,2,3] < [1,2,3,4]
+
+Since strings are lists of characters in Haskell, we can do the same kinds of comparison operations on strings. Check whether Aardvark comes before Aaronic in the dictionary with this code: "Aardvark" < "Aaronic"
+
+Now let's think about list membership. We want a boolean function that returns true if a value is part of a list, and false otherwise. This is the elem function. Try elem 1 [1,2,3]
+
+prefix functions are the functions the comes before the parameters : man, min and lenght for ex
+infix functions are the functions the comes between the parameters : +, - and *
+
+In fact, Haskell permits any two-argument function to be written as an infix operator using backquote characters. For a further example, try the max function as an infix operator: 42 `max` 13
+
+Also note that any Haskell infix operator, e.g. +, can be written as a prefix operator by enclosing it in parentheses, like (+) 1 1
+
+
+zip functions zipps two lists
+zip [1,2,3] ['a','b','c'] -> [(1,'a'), (2,'b'), (3,'c')]
+
+zip3 does the same for 3 lists
+
+if we zip 2 lists a and b, if the lenth of a is shorter, the resulting list is the same lenght of the shorter list
+
+zipWith is the function that let's you choose how to zip your 2 functions,
+
+zipWith max [1,2,3] [0,8,1]
+
+zipWith (\x->(\y->(x, y))) [1,2,3] "abc"
+or
+zipWith (\x y->(x, y)) [1,2,3] "abc"
+
+----------
+
+Logical operators
+
+not, &&, ||, and 'xor'
+
+
+It's straightforward to enumerate the full truth table for two-input boolean functions.
+
+We could use a list comprehension expression to enumerate the input values:
+[(x,y) | x<-[False, True], y<-[False, True]].
+
+Then we could map the boolean function over these input values (extracted from the pairs).
+
+For instance, here are the enumerated output values for the xor function:
+
+-----lambda----xoring the fst and snd of the set---generating the set----------------
+       |         |         |       |               |     |
+       ^         ^         ^       ^               ^     ^
+map (\inputs -> xor (fst inputs) (snd inputs)) [(x,y) | x<-[False, True], y<-[False, True]].
+
+
+
+Logic Operations with More Inputs
+
+Sometimes, boolean logic functions like AND and OR have more than two inputs. Haskell supports these multi-input boolean operations with AND and or functions that take a list of boolean values as a single input. Effectively, this is a fold of the && or || operator over the input list of boolean values.
+
+Try and [False, True, False, True] or or [True, True, False], for instance.
+
+
+*if Expressions*
+
+You might be used to if statements in imperative programming languages. Haskell has if expressions, which evaluate to either the then value or the else value, based on the if value.
+Try if 2*2==4 then "happy" else "sad".
+
+if 1 then 42 else 66 -> fails because the condiction must be boolean.
+if False then 42 else "foo" -> fails because the then and else not the same datatype.
+
+Once again, this if expression fails to evaluate because of type errors. Haskell detects that the then value and the else value have incompatible types, so it complains.
+It is possible to have two values that are similar, i.e. they could be specialized to the same type, based on their type classes. For instance, try if True then 42 else pi.
+
+----------------------------------------
+
+let x = 5 in x == 5
+ means let x = 5, then perform x == 5
+
+----------------------------------------
+
+ input and output in Haskell are moderately complex, due to the pure nature of the language.
+
+The Haskell function to print a character string to the terminal is called putStrLn (like println in Java or print in Python).
+Try printing a simple message like: putStrLn ("good " ++ "morning" ++ " everyone")
+
+we can read in a character string from user input by calling the getLine function
+
+Now let's chain together some input and output - with appropriate sequencing.
+We want to find the name of a person, then print out a personalized greeting.
+do {
+	putStrLn "what is your name?";
+	x <- getLine;
+	putStrLn ("hello " ++ x)
+}
+
+The do block sequences IO actions.
+
+Be aware that you can't use the standard assignment (with the equals operator) for getLine, since it is an IO operation.
+
+Once we have got a value from getLine, and bound it to a variable, then we can do standard function calls on this value, and bind it to another variable -- for instance, let's turn a name into upper case:
+
+do {
+	putStrLn "what is your name?";
+	n<-getLine;
+	let nUpper = map toUpper n
+	in putStrLn ("HELLO " ++ nUpper)
+}
+
+
+
+------------------------------------------
+
+A pure function does not depend on the ‘state of the world’. The computation is entirely self-contained and independent.
+Given the same arguments, a pure function will always return the same result.
+
+Input and output (I/O) operations are impure.
+They influence and interact with the ‘outside world’.
+
+So far we have looked at the getLine function, which reads input from the user and returns it as a special kind of String value — an IO String.
+
+
+The point of IO types is that we don’t want to mix up pure and impure functions — the type system keeps us honest.
+We know from a function’s type whether it is involved with I/O.
+
+Sequencing Actions
+
+Look at this simple function below.
+
+let greet() = do
+    planet <- getLine
+    home <- getLine
+    putStrLn ("greetings " ++ planet ++ "ling.")
+    putStrLn ("I am from " ++ home ++ ".")
+    putStrLn "Take me to your leader."
+
+
+or
+
+
+do {
+    planet <- getLine;
+    home <- getLine;
+    putStrLn ("greetings " ++ planet ++ "ling.");
+    putStrLn ("I am from " ++ home ++ ".");
+    putStrLn "Take me to your leader."
+}
+
+Notice that the ordering is important here:
+    we want the first getLine call to get the name of the planet we have landed on
+    we want the second getLine call to get the name of where we are from.
+
+Order of function evaluation doesn’t matter in pure code - e.g.
+
+let a = reverse "winston"
+    b = reverse "churchill"
+in "sir " ++ a ++ " " ++ b
+
+or
+
+let a= reverse "winston"; b = reverse "churchill"  in "sir " ++a ++" "++ b
+
+It doesn’t matter whether we do the first reverse before the second — the result of the expression is still the same.
+ However this is not the case where I/O is concerned.
+ Sequencing is vital for I/O actions.
+
+One more thing to notice: inside the do, we associate results of IO functions with names using <-. Inside the let, we associate pure function results with names using =
+
+
+Monads are Hiding Below
+
+The do notation allows us to sequence actions.
+This looks just like a sequence of commands in an imperative programming language.
+However, do is only syntactic sugar.
+Underneath, it is rewritten as a chain of function calls where the output of the first function becomes the input of the second function.
+The bind operator accomplishes this function sequencing.
+It is a key part of the IO monad.
+
+Summary
+
+For now, all we need to understand is:
+    I/O operations are impure
+    use do to specify a sequence of actions
+    use <- inside a do to associate input values with names
+    any value or function that involves I/O has IO in its type
+    a sequence of I/O actions is described as being in the IO Monad
+
+
+factorial function :
+in the prelude:
+let fact n = if n == 0 then 1 else n*fact(n-1)
+
+in a separate file:
+fact :: Int -> Int
+fact n = if n ==0 then 1 else n*fact(n-1)
+or we could write
+fact :: Int -> Int
+fact 0 = 1
+fact n = n*fact(n-1)
+
+when we give input to the function (fact) it matches the first case (fact 0 = 1) then the second case (fact n = n*fact(n-1))
+
+Remember the concatWithSpace function? We can use :type to see what type it has too.
+
+Prelude> concatWithSpace :: [Char] -> [Char] -> [Char]
+Prelude> concatWithSpace l1 l2 = l1 <> " " <> l2
+Prelude> :type concatWithSpace
+concatWithSpace :: [Char] -> [Char] -> [Char]
+                   ================    ======
+                        input          output
+
+you don't always need to define the signature of the function "concatWithSpace :: [Char] -> [Char] -> [Char]" as haskell easily detects it.
+
+
+
+What is wrong with this line of code, to return the number of characters typed by a user?
+let x = getLine
+in length(x)
+
+The code associates the name x with the getLine function, rather than receiving a line of input from the user — and we can’t take length of a function.
+and that's why we use <- to get the value coming from getLine and not the function it self
+
+Why do you think the generation and use of pseudo-random numbers might occur inside a monad?
+because the sequence of pseudo-random numbers is important, and the programmer needs to control it.
+
+
+
+----------------------------------------------------------------
+------------------------------------------------------------------
+----------------------------------------------------------------
+Recursive Functions on Lists
+
+
+
+There are two approaches to working with lists:
+    Write functions to do what you want, using recursive definitions that traverse the list structure.
+    Write combinations of the standard list processing functions.
+
+The second approach is preferred, but the standard list processing functions do need to be defined, and those definitions use the first approach (recursive definitions).
+
+
+Recursive definition of length
+The length of a list can be computed recursively as follows:
+'''
+length :: [a] -> Int           -- function type
+length [] = 0                  -- base case
+length (x:xs) = 1 + length xs  -- recursion case
+'''
+
+
+Recursive definition of filter
+
+filter is given a predicate (a function that gives a Boolean result) and a list, and returns a list of the elements that satisfy the predicate.
+
+filter :: (a->Bool) -> [a] -> [a]
+filter (<5) [3,9,2,12,6,4] -- > [3,2,4]
+
+Filtering is useful for the “generate and test” programming paradigm.
+
+The library definition for filter is shown below (using guards).
+
+filter :: (a -> Bool) -> [a] -> [a]
+filter pred []    = []
+filter pred (x:xs)
+  | pred x         = x : filter pred xs
+  | otherwise      = filter pred xs
+
+
+Many computatations that would be for/while loops in an imperative language are naturally expressed as list computations in a functional language.
+
+There are some common cases:
+
+Perform a computation on each element of a list: map
+Iterate over a list, from left to right: foldl
+Iterate over a list, from right to left: foldr
+
+It’s good practice to use these three functions when applicable
+
+*Function composition*
+
+We can express a large computation by “chaining together” a sequence of functions that perform smaller computations
+
+Start with an argument of type a
+Apply a function g::a−>b to it, getting an intermediate result of type b
+Then apply a function f::b−>c
+to the intermediate result, getting the final result of type c
+The entire computation (first g, then f) is written as f∘g.
+This is traditional mathematical notation; just remember that in f∘g, the functions are used in right to left order.
+
+Haskell uses . as the function composition operator
+
+(.) :: (b->c) -> (a->b) -> a -> c
+(f . g) x = f (g x)
+
+
+[x0,x1,x2] is the same as x0 :  x1 : x2 : []
+
+
+
+map applies a function to every element of a list
+
+map f (map g xs) = map (f . g) xs
+
+map :: (a -> b) -> [a] -> [b]
+map _ []     = []
+map f (x:xs) = f x : map f xs
+
+
+Folding a list (reduction)
+
+An iteration over a list to produce a singleton value is called a fold
+
+
+foldl is fold from the left
+Think of it as an iteration across a list, going left to right.
+A typical application is foldl f z xs
+The z::b is an initial value
+The xs::[a] argument is a list of values which we combine systematically using the supplied function f
+A useful intuition: think of the z::bargument as an “accumulator”.
+
+The function f takes the current value of the accumulator and a list element, and gives the new value of the accumulator.
+
+
+----------function as an argument that takes the accumulator and single element a from a list then return a new accumulator
+             |
+             ^
+foldl :: (b->a->b) -> b -> [a] -> b
+
+foldl (+) z []          -- > z
+foldl (+) z [x0]        -- > z + x0
+foldl (+) z [x0,x1]     -- > (z + x0) + x1
+foldl (+) z [x0,x1,x2]  -- > ((z + x0) + x1) + x2
+
+
+the function f (+ for our example) takes 2 arguments, the value clculated before (old accumulator) and new element list
+
+foldl (+) z [x0,x1,x2]  -- > ((z + x0) + x1) + x2
+      (+) z x0
+  (+)((+) z x0) x1
+(+)((+)((+) z x0) x1) x2
+
+
+
+defination :
+
+foldl        :: (b -> a -> b) -> b -> [a] -> b
+foldl f z0 xs0 = lgo z0 xs0
+             where
+                lgo z []     =  z
+                lgo z (x:xs) = lgo (f z x) xs
+
+
+now what about foldr
+
+
+----------function as an argument that takes single element a from a list and accumulator and return a new accumulator
+               |
+               ^
+foldr :: (a -> b -> b) -> b -> [a] -> b
+
+foldr (+) z []          -- > z
+foldr (+) z [x0]        -- > x0 + z
+foldr (+) z [x0,x1]     -- > x0 + (x1 + z)
+foldr (+) z [x0,x1,x2]  -- > x0 + (x1 + (x2 + z))
+
+defination :
+
+foldr            :: (a -> b -> b) -> b -> [a] -> b
+foldr k z = go
+          where
+            go []     = z
+            go (y:ys) = y `k` go ys
+
+fold examples
+
+sum xs = foldr (+) 0 xs
+product xs = foldr (*) 1 xs
+
+sum      = foldr (+) 0
+product  = foldr (*) 1
+
+^
+|
+(This is sometimes called “point free” style because you’re programming solely with the functions; the data isn’t mentioned directly.)
+
+more examples
+
+foldr (:)  [] [x0,x1,x2]
+  -- >
+  x0 :  x1 : x2 : []
+
+We can formalise this relationship as follows:
+foldr cons []xs = xs
+
+A recursive function must have at least two cases which are base case and induction case
+
+The basic mechanism for computing on any datastructure in Haskell is recursion. Recursion always has a base case and an induction case. For lists, the base case is the empty list [], the induction case is adding an element to the list x:xs
+
+For list operations, it is usually easier to use higher-order functions like map (performing an operation on every element of a list) and foldl/foldr (reducing a list to a single value). Sometimes these functions are referred to as list combinators.
+
+
+-------------------------------------------------
+
+*define new datatypes*
+
+
+examples:
+
+data SimpleNum = One | Two | Many deriving Show
+x = One
+
+
+      constructors (secretly we know it's a function that takes [Char] Int Int and returns CricketScore, Score::[Char]->Int->Int->CricketScore)
+                      |
+data CricketScore = CricketScore [Char] Int Int deriving Show
+x = Score "dragon" 5 6
+
+
+these kinds of custom data types are called algebraic data types.
+
+The alternative values relate to algebraic sums (like SimpleNum).
+The record values relate to algebraic products (like CricketScore).
+
+
+1 - we use the "data" keyword to define a new custom type.
+2 - types must derive the Show type class if we want to see their values printed out.
+3 - we used vertical bars "|" to specify alternatives, or sum data types.
+4 - we used type constructors to build record types like score values in cricket, which are product data types.
+
+
+Type classes :
+
+We have types (which are like Int, Float, Integer) and type classes (Num, Show, Read, Eq) that react like they are interfaces in oop, the types needs to implement the type classes to be able to use mathematical
+
+If we write in the prelude
+:type (+)
+
+      context of the type.
+         |
+         *
+(+) :: Num a => a -> a -> a
+
+this says, given a type (a) belonging to the Num type class , then the + function takes two a parameters and returns an a result.
+a is a type variable not a type class (the type class is Num).
+
+The part of the type before the double arrow here is called the context of the type.
+This expresses type class (Num) membership for type variables (a).
+So a type class (Num) is a generalized family of similar types (like a).
+
+and the same goes for (== function)
+
+:type (==) //note that we need to put == inside () because it's an infix function.
+(==) :: Eq a => a -> a -> bool
+
+:type (>) //note that we need to put > inside () because it's an infix function.
+(>) :: Ord a => a -> a -> bool
+
+Let's do an example of SimpleNum
+
+data SimpleNum = One | Two | Many deriving (Show, Read, Eq)
+
+function, 42 is the value of type Int which is an "instance" of the show type class
+ |        |
+ *        *
+show     42
+
+summery
+1- type classes contains member types (instances) to conform to an APIs
+2- Type classes are like interfaces in OOP
+3- Types are like concrete implementation of interfaces (type classes).
+4- Type classes enables operator overloading.
+-------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------
+
+
+In Haskell, a let expression provides local scope.
+A let expression has a series of equations defining variable values and a final expression (after the in keyword) that computes a value with those variables in scope.
+
+journeycost :: Float -> Float -> Float
+journeycost miles fuelcostperlitre =
+ let milespergallon = 35
+     litrespergallon = 4.55
+     gallons = miles/milespergallon
+ in (gallons*litrespergallon*fuelcostperlitre)
+
+
+The where keyword, inside an equation, provides definitions for variables that are used in the equation.
+
+cel2fahr :: Float -> Float
+cel2fahr x = (x*scalingfactor) + freezingpoint
+ where scalingfactor = 9.0/5.0
+       freezingpoint = 32
+
+
+You might think let and where are very similar!
+
+    Both introduce a local scope.
+    Both allow any number of equations to be written.
+    Both allow the equations to be written in any order, and variables defined in any equation can be used (“are in scope”) in the other equations.
+
+However there are some important differences:
+
+    let expressions are expressions; let can be used anywhere an expression is allowed.
+    where clauses are not expressions; they can be used only to provide some local variables for a top level equation.
+
+we could use where with guards
+
+holeScore :: Int -> Int -> String
+holeScore strokes par
+  | score < 0 = show (abs score) ++ " under par"
+  | score == 0 = "level par"
+  | otherwise = show(score) ++ " over par"
+ where score = strokes-par
+
+
+So what is guards ?
+
+Haskell provides a notation for defining functions based on predicate values.
+For instance, the absolute value of a number is its magnitude, i.e. ignoring its sign.
+You could define a function to calculate the absolute value with an if/then/else conditionalNotice how there is no equals sign on the first line of the function definition — but there is an equals sign after each guard.
+The otherwise guard should always be last, it’s like the default case in a C-style switch statement.
+
+so what about otherwise ?
+"otherwise" is a guard that is always True will and will always be executed, if no previous guards have evaluated to True.
+
+Case expressions
+
+A value with an algebraic data type may have one of several different forms
+Therefore to process such a value we need several segments of code, one for each possible form.
+The case expression examines the value, and chooses the corresponding clause.
+It’s like a guard, but it selects based on the form of the value, i.e. it does pattern matching.
+
+
+hello :: Pet -> String
+hello x =
+  case x of
+    Cat -> "meeow"
+    Dog -> "woof"
+    Fish -> "bubble"
+    Parrot name -> "pretty " ++ name
+    _ -> "grunt
+
+
+How would you rewrite an if expression as a case expression? In fact, this is what happens in the core language. The if expression is just syntactic sugar that is rewritten automatically.
+
+
+otherwise is a guard that is always True and will always be executed, if no previous guards have evaluated to True.
+
+Select which one of the following two let expressions will evaluate to the String.
+
+
+
+let x = numeral ++ " minister"  where numeral = "prime" in x (correct) -> The where clause is linked with the definition of x, not the overall let expression
+(where is attached to the expression "numeral ++ " minister"")
+
+let x = numeral ++ " minister"  in x where numeral = "prime" (wrong) -> This does not evaluate in GHCi — the where clause is dangling.
+(where isn't attached to any expression)
+
+------------------------------------------------------------
+
+Dealing with Uncertainty  (is it like try and catch?!)
+
+It's meant to handle failed computations, and I mean EXCEPTIONS (like trying to get first elem of empty list or dividing by 0).
+
+We have the class maybe
+
+       (1) (2)      (3)      (4)(5)
+        |   |        |        |  |
+data  Maybe a  =  Nothing | Just a deriving ( Eq, Ord )
+
+form the implementation of the datatype we notice that it has only 2 evaluates (Nothing, Just a)
+(1) New Datatype name
+(2) The datatype that the "maybe" gonna expect and use
+(3) In case of no data we the assigned value to the maybe datatype is Nothing
+(4) In case of there is data in the same type given in point (2) we use the constructor Just and put the data in (a)
+(5) The instance of type (2) that there is a value assigned to it in case of real data Given
+
+example :
+
+a function to find the maximum of a lists
+
+maxhelper :: Int -> [Int] -> Int
+maxhelper x [] = x
+maxhelper x (y:ys)
+  | x > y = maxhelper x ys
+  | otherwise  = maxhelper y ys
+
+
+                   the resulting type is "maybe" that can hold Int
+                          \
+maxfromlist :: [Int] -> Maybe Int
+
+in case of there is no data we return Nothing
+                   \
+maxfromlist [] = Nothing
+
+in case of there is data we return the value but using the Just constructor (because the output type of the class in "maybe" that holds Int)
+                      \
+maxfromlist (x:xs) = Just (maxhelper x xs)
+
+
+Once we've generated Maybe values, how do we propagate them in programs?
+Perhaps by using lots of case statements XD
+But surely there must be a better way (monads).
+
+let inc = (+1)
+
+inc (Just 1)    -> will give us an error
+
+to map over maybe values
+
+fmap inc (Just 1)   -> Just 2
+
+fmap inc Nothing    -> Nothing
+
+
+-----------------------------------------------------------------------------
+
+Text parsing
+
+A parser parses text into a tree
+
+The ideal parser takes input text and returns a tree or any data structure (we may need to return the remaining text that the parser couldn't get so we could chain multiple parsers together)
+
+         arbitary type a (tree or a string or a number or whatever)
+            |              |
+type Parser a = String -> [(a, String)]
+
+Note that it's not a defination of data, it's a defination of a type
+
+we have put the output inside a list because if there is no match we could get an empty list instead of an error.
+and if it succeeded we will get a list with one element (pair of data structure and a remaining string).
+
+
+so now let's use the parser function (not related to the definition we made earlier, it's a total different function)
+which takes a parser and a string to parse
+
+this is from the new type we defined earlier
+        |
+parse digit "123"      //the digit parser gets only a digit (and from our case the parser got a character from the beginning of a the string).
+[("123", "")]
+
+
+parse (some digit) "123"     //function some applies the parser to every character of a string.
+
+parse (digit <|> letter) "123"     //the <|> operator give me choises (it will try to find the digit, if not then a letter)
+
+
+the do notation
+
+when we want to sequences (do this then do that),
+
+to match natural number
+
+nat =
+  do
+    x <- some digit
+    return (read xs)
+
+to match Integers
+
+int =
+  do
+    char '-'
+    n <- nat
+    return (-n)
+  <|>
+    nat
+
+
+
+
+    Summary
+
+        Parsec makes it easy to build powerful text parsers from building blocks using predefined parsers and parser combinators.
+
+        The basic structure of a Parsec parser is quite generic and reusable
+
+        The example shows how to parse structured text (output from Show) and generate an XML document containing the same information.
+
+
+Each parser is a higher-order function that returns a function. The parser combinators combine these functions into the final parser.
+
+----------
+
+
+Quiz
+
+study this code :
+
+
+---------
+module JSONTypes (
+        JValue(..),
+        mkJPair,
+        mkJObj
+         )
+    where
+
+import Data.Map hiding ( map )
+
+type JMap = Data.Map.Map String JValue
+data JValue = JString String
+            | JNumber Integer
+            | JObject JMap
+            | JArray [JValue]
+            | JBool Bool
+            | JNull
+    deriving (Show)
+
+mkJPair k v = JObject (Data.Map.singleton k v)
+
+mkJObj :: [JValue] -> JValue
+mkJObj j_vals =
+    let
+        list_of_maps = map (\(JObject pair) -> pair) j_vals
+        combined_map = Data.Map.unions list_of_maps
+    in
+        JObject combined_map
+---------
+
+
+What is the type of the function json_parser?
+
+json_parser :: Parser ??????
+json_parser = do
+        whiteSpace
+        j_top <- ( json_array_parser <|> json_obj_parser)
+        return j_top
+
+json_parser :: Parser ???????      // the answer is JValue
+
+A Parsec parser is a monadic parser, this means the type consists of the name of the monad (Parser) followed by the type of the input to the parser.
+
+-----------
+
+
+A JSON array consists of a comma-separated list of JSON values enclosed by braces, e.g.
+
+ [ 1, 'two',  [ 3, true] ]
+
+To parse this format we use the function json_array_parser below. What is the correct data constructor for the return value?
+
+json_array_parser :: Parser JValue
+json_array_parser = do
+    j_vals <- brackets $ commaSep json_value_parser
+    return $ ???? j_vals -> the answer is JArray
+
+The return value of a parser of type Parser T must be a valid type constructor for the type T.
+
+-------------
+
+
+
+
+The JSON format supports boolean values, named true and false.
+
+In the boolean JSON value parser below, what is the missing combinator?
+
+json_bool_parser = do
+    bstr <- ( symbol "true" ???? symbol "false" )  // the answer is <|>
+    let
+        bval = if bstr == "true" then True else False
+    return $ JBool bval
+
+The parser symbol parses the exact string that is its argument, in this case either “true” or “false”. You have to provide a Parsec parser combinator so that the correct option will be selected when calling the parser.
+
+--------------
+
+
+
+A JSON object is a list of key-value pairs, where the key is a string and the value a JSON value, enclosed in braces, e.g.
+
+{ "Street" : "Lilybank Gardens",
+  "Nr" : 18,
+  "Org" : [
+        "University of Glasgow",
+        { "School" : "Computing Science"}
+  ]
+}
+
+The most general JValue parser is json_value_parser, which is built of parsers for specific JSON values:
+
+json_value_parser =
+    json_array_parser <|>
+    json_obj_parser <|>
+    json_string_parser <|>
+    json_number_parser <|>
+    json_bool_parser <|>
+    json_null_parser
+
+In the JSON pair parser below, provide the name of the parser for the ‘value’ part of the pair
+
+json_pair_parser = do
+    k <- stringLiteral
+    colon
+    v <- ??? // the answer is json_value_parser
+    return $ mkJPair k v
+
+The parser for the ‘value’ of a pair in a JSON object must be able to parse any JSON value.
+
+---------------
+
+
+
+In the JSON object parser below, complete the return expression.
+
+json_obj_parser :: Parser JValue
+json_obj_parser = do
+    j_vals <- braces $ commaSep json_pair_parser -- a list of pairs
+    return $ ??? j_vals  // the correct answer is mkJObj
+
+
+The JSON object is a list of key-value pairs that can be accessed through the key. The Haskell equivalent is provided by Data.Map and implemented as a type alias JMap.
+
+----------------
+----------------
+----------------
+
+ Using QuickCheck
+
+import Test.QuickCheck
+
+             (1)           (2)
+              |             |
+quickCheck ((\n->(abs(n) == n))::Int->Bool)
+
+we notice here that we used quickCheck function and we gave it the function (1) and in this case it was a lambda function we want to test and what the result (2) should be
+
+It’s helpful to put the types in here. We have created a lambda function that takes a single integer parameter then checks to see whether it is equal to its absolute value.
+
+
+examples:
+
+Maybe we could that the first element of a sorted list is its minimum, or that the last element is its maximum?
+
+import Data.List
+quickCheck ((\l->((minimum l) == (sort l)!!0))::[Int]->Bool)
+
+fails ?!
+
+quickCheck ((\l->(if l==[] then True else (minimum l) == (sort l)!!0))::[Int]->Bool)
+
+Success
+
+
+to get the full test results verboseCheck instead of quickCheck
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------
+
+
+ in programming languages laziness is a feature and may be considered a good thing. Haskell is a lazy language.
+ This means that the evaluation of expressions is delayed until their values are actually needed.
+ The opposite is eager evaluation, which is what most programming languages implement, like C, Java, and Python.
+
+ example
+f :: Int -> Int -> Int
+f x y = y
+
+f (1+1) (2+2)
+
+Whereas in a lazy language, like Haskell, the calculation 1 plus 1 is only done when the parameter value is used in the function body, which will never happen
+but it will happen in the eager languages when only call the function, even if we don't really use the parameters.
+
+Infinite data structures.
+
+Laziness is very useful when dealing with infinite data. For example, think of the infinite list of one values.
+That's an infinite list where each element is the integer one.
+
+Let ones = 1 : ones
+or
+[1..]
+or
+repeat 'a'
+
+Use the take and drop functions to deal with infinite lists.
+
+It’s permitted to do a finite amount of processing in an infinite list, but not to traverse it infinitely.
+
+
+take 3 ones     ->     [1, 1, 1]
+drop 3 ones     ->     it will drop the first 3 elements and return the rest (which are infinite)
+
+The reason why Haskell can process infinite lists is because it evaluates the lists in a lazy fashion — i.e. it only evaluates list elements as they are needed.
+
+
+Fibonacci Numbers :
+
+let fibs = 1:1:(zipWith (+) fibs (tail fibs))
+
+Prime Numbers :
+
+properfactors :: Int -> [Int]
+
+            the x is taken from here, and the y is from here because filter function takes one by one from the list (second param) and gives it to function (first param)
+              |                |       |
+properfactors x = filter (\y->(x `mod` y == 0)) [2..(x-1)]
+
+numproperfactors :: Int -> Int
+numproperfactors x = length (properfactors x)
+
+primes :: [Int]
+primes = filter (\x-> (numproperfactors x == 0)) [2..]
+
+Let’s analyse how this definition works:
+
+    The properfactors function takes an integer value x and returns a list of proper factors for x. Factors are numbers that divide x and leave no remainder. Proper factors for an integer x do not include 1 or x.
+    The numproperfactors function simply counts how many proper factors there are for x, by returning the length of the properfactors x list.
+    Finally, primes list uses the filter function to select integers x that have no factors in the range 2 to (x-1) inclusive.
+
+We can evaluate individual elements of this list using the !! indexed list selection. Or we could take the first n elements
+
+
+Given a BinaryTree data type as defined earlier in the course:
+
+data BinaryTree = Leaf | Node Int BinaryTree BinaryTree deriving Show
+
+with Leaf and Node constructors, then how do we define an infinite tree?
+
+
+                        recursion call to the same function (one time from the right and one time from the list)
+                              |                  |
+mkInfiniteBinaryTree = Node 0 (mkInfiniteBinaryTree) (mkInfiniteBinaryTree)
+
+This recursive definition creates a binary tree of infinite depth where every node has a 0 value.
+
+--------------------------------------------
+
+
+
+Does the following expression terminate?
+
+let bot = bot
+    bottomList = repeat bot
+in length(take 5 bottomList)
+
+the returning integer value is 5
+
+because We never evaluate bot, or the full extent of the infinite list, due to lazy evaluation.
+
+
+-----------------------------------
+---------------------------------------
+-----------------------------------
+
+Function types
+
+    Ordinary data types are for primitive data (like Int
+
+and Char) and basic data structures (like [Int] and [Char]
+).
+
+Algebraic data types are types that combine other types either as records (‘products’), e.g.
+
+  data Pair = Pair Int Double
+
+or as variants (‘sums’), e.g.
+
+  data Bool = False | True
+
+Functions have types containing an arrow, e.g. Int -> String
+
+
+----------------------------------------------------
+
+
+Lambda expressions:
+
+Named and anonymous expressions
+
+look at this expresion
+
+(-b) + sqrt (b^2 - 4*a*c)
+
+
+Without anonymous expressions, writing this would almost be like assembly language:
+
+e1 = (-b)
+e2 = b^2
+e3 = 4*a
+e4 = e3*c
+e5 = e2-e4
+e6 = e1+e5
+
+
+Anonymous functions
+
+    A function can be defined and given a name using an equation:
+
+    f :: Int -> Int
+    f x = x+1
+
+
+
+
+Since functions are “first class”, they are ubiquitous, and it’s often useful to denote a function anonymously.
+
+This is done using lambda expressions.
+
+\x -> x+1
+
+Pronounced “lambda x arrow x+1”.
+
+Functions are first class: you can use a lambda expression wherever a function is needed. Thus
+
+But lambda expressions are most useful when they appear inside larger expressions.
+such as map
+
+map (\x -> 2*x + 1) xs
+
+
+
+
+Monomorphic and polymorphic functions
+Monomorphic functions
+
+Monomorphic means “having one form”.
+
+    f :: Int -> Char
+    f i = "abcdefghijklmnopqrstuvwxyz" !! i
+
+    x :: Int
+    x = 3
+
+    f x :: Char
+    f x -- > 'd'
+
+Polymorphic functions
+
+Polymorphic means “having many forms”.
+
+    fst :: (a,b) -> a
+    fst (x,y) = x
+
+    snd :: (a,b) -> b
+    snd (x,y) = y
+
+    fst :: (a,b) -> a
+    fst (a,b) = a
+
+    snd :: (a,b) -> b
+    snd (a,b) = b
+
+
+
+
+Currying
+
+    Most programming languages allow functions to have any number of arguments.
+
+    But this turns out to be unnecessary: we can restrict all functions to have just one argument, without losing any expressiveness.
+
+    so the function that takes many arguments takes one argument and returns a function that takes another argument and so on till the number of arguments is zero.
+
+    This process is called Currying.
+
+        The technique makes essential use of higher order functions.
+
+        It has many advantages, both practical and theoretical.
+
+
+You can write a definition like this, which appears to have two arguments:
+
+    f :: Int -> Int -> Int
+    f x y = 2*x + y
+
+But it actually means the following:
+
+    f :: Int -> (Int -> Int)
+    f 5 :: Int -> Int
+
+
+The function takes its arguments one at a time:
+
+    f 3 4 = (f 3) 4
+
+    g :: Int -> Int
+    g = f 3
+    g 10 -- > (f 3) 10 -- > 2*3 + 10
+
+
+The arrow operator takes two types a -> b, and gives the function of type of a and with argument type a and result type b.
+
+and for the lambda functions:
+
+\x y z -> ........
+
+can be
+
+\x -> (\y -> (\z -> ........))
+
+
+Type classes and ad-hoc polymorphism
+
+
+the (+) has which type?
+
+(+) :: Int -> Int -> Int
+(+) :: Integer -> Integer -> Integer
+(+) :: Ratio Integer -> Ratio Integer -> Ratio Integer
+(+) :: Double -> Double -> Double
+
+(+) :: a -> a -> a  -- Wrong! has to be a number
+
+or we could say that (+) has type a -> a -> a for any type a that is a member of the type class Num.
+
+(+) :: Num a => a -> a -> a
+
+
+
+kinds of polymorphism.
+
+  Parametric polymorphism.
+
+    A polymorphic type that can be instantiated to any type.
+
+    Example: length::[a] -> Int
+    can take the length of a list whose elements could have any type.
+
+  Ad hoc polymorphism.
+
+    A polymorphic type that can be instantiated to any type chosen from a set, called a “type class”
+
+    Represented by a type variable that is constrained using the  =>  notation.
+
+    Example: (+)::Numa => a -> a -> a
+    says that (+) can add values of any type a, provided that a is an element of the type class Num.
+
+
+Type inference
+
+    Type checking takes a type declaration and some code, and determines whether the code actually has the type declared.
+
+    Type inference is the analysis of code in order to infer its type.
+
+    Type inference works by
+
+        Using a set of type inference rules that generate typings based on the program text
+
+        Combining all the information obtained from the rules to produce the types.
+
+for example:
+
+f:: a-> b -> c
+
+f x xs = x + length xs + head xs
+
+-- let's add the constrains
+
+(x) :: Num a => a -> a -> a       # 1
+length :: [a] -> Int              # 2
+head :: [a] -> a                  # 3
+
+so from #1 this means x must me Num
+and from #2 lenth must return Int
+so this mean x must be Int also
+and from #3 this means that the list must contain Int to be valid
+
+-- so it follows that
+
+length xs :: Int
+x :: Int
+head xd :: Int
+
+
+
+
+Given the following type declarations:
+
+f :: T1 -> T2
+g :: T2 -> T3
+
+And given that the following expression typechecks:
+
+v :: T1
+v = h f g
+
+What is the type of h?
+h :: T1 -> T2 -> (T2 -> T3) -> T1
+
+
+Partial application
+
+Partial application means that we don’t need to provide all arguments to a function. For example, given
+
+    sq x y = x*x+y*y
+
+We note that function application associates to the left, so the following equivalence holds
+
+    sq x y = (sq x) y
+
+We can therefore create a specialised function by partial application of x:
+
+    sq4 = sq 4 -- = \y -> 16+y*y
+    sq4 3 -- = (sq 4) 3 = sq 4 3 = 25
+
+This is why you can write things like:
+
+    doubles = map (*2) [1 .. ]
+
+
+
+
+
+Is the following expression correctly typed?
+
+sq :: Int -> Float
+sq x = x*x
+
+no because Multiplying two integers produces another integer.
+
+Summary
+
+Function types describe the types of arguments and return value of a function. The type of an argument can be a type variable, in which case we call the function polymorphic.
+
+Currying means rewriting a function of more than one argument to a sequence of functions, each with a single argument.
+
+Type classes allow to impose restrictions on polymorphic type variables. Type classes express that e.g. a type represents a number, or something that can be ordered.
+
+Type inference is the analysis of code in order to infer its type. It works using type inference rules that generate typings based on the program text.
+
+
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+
+type classes in details
+
+A type class is a set of types for which some operations are defined.
+
+In a word we could say they are like interfaces in OOP
+
+let's define a type
+
+data Bright
+  = Blue
+  | Red
+  deriving (Read, Show)
+
+darkBright :: Bright -> Bool
+darkBright Blue = True
+darkBright Red  = False
+
+lightenBright :: Bright -> Bright
+lightenBright Blue = Red
+lightenBright Red = Red
+
+and another Color
+
+data Pastel
+     = Turquoise
+     | Tan
+     deriving (Read, Show)
+
+darkPastel :: Pastel -> Bool
+darkPastel Turquoise = True
+darkPastel Tan       = False
+
+lightenPastel :: Pastel -> Pastel
+lightenPastel Turquoise = Tan
+lightenPastel Tan       = Tan
+
+notice both of our color types have functions to decide whether it’s dark, or to lighten it.
+
+We can define a class Color and its corresponding functions.
+
+class Color a where
+      dark :: a -> Bool
+      lighten :: a -> a
+
+we read the previous as follow:
+
+Color is a type class
+
+The type variable (a) stands for a particular type that is in the class Color
+
+For any type (a) in Color, there are two functions you can use: dark and lighten, with the specified types.
+
+
+Now we go for defining instances for the type class
+
+
+An instance declaration says that a type is a member of a type class.
+
+When you declare an instance, you need to define the class functions.
+
+The following says that the type Bright is in the class Color, and for that instance (type), the dark function is actually darkBright.
+
+
+instance Color Bright where
+      dark = darkBright
+      lighten = lightenBright
+
+
+
+Num is the class of numeric types.
+
+class Num a where
+      (+), (-), (*) :: a -> a -> a
+
+
+addInt, subInt, mulInt :: Int -> Int -> Int
+addDbl, subDbl, mulDbl :: Double -> Double -> Double
+
+    instance Num Int where
+      (+) = addInt
+      (-) = subInt
+      (*) = mulInt
+
+    instance Num Double where
+      (+) = addDbl
+      (-) = subDbl
+      (*) = mulDbl
+
+
+
+
+There are some operations (addition) that are valid for all numeric types.
+
+There are some others (trigonometric functions for example) that are valid only for some numeric types.
+
+Therefore there is a rich hierarchy of subclasses
+
+
+The Show class
+
+show::Show a => a -> String
+
+
+data Foo = Bar | Baz
+
+instance Show Foo where
+  show Bar = "it is a bar"
+  show Baz = "this is a baz"
+
+or we could do
+
+data Foo2 = Bar2 | Baz2
+  deriving (Read, Show)
+
+
+----------------------------------------
+----------------------------------------
+----------------------------------------
+
+Introduction to the Lambda calculus
+
+The lambda calculus was developed in the 1930s by Alonzo Church (1903–1995), one of the leading developers of mathematical logic.
+
+A major (really the major) breakthrough in computability theory was the proof that the lambda calculus and the Turing machine have exactly the same computational power.
+
+
+Lambda calculus and it's Significance to programming languages
+
+
+
+The lambda calculus has turned out to capture two aspects of a function:
+
+    A mathematical object (set of ordered pairs from domain and range), and
+
+    An abstract black box machine that takes an input and produces an output.
+
+
+
+The lambda calculus is fundamental to denotational semantics, the mathematical theory of what computer programs mean.
+
+Functional programming languages were developed with the explicit goal of turning lambda calculus into a practical programming language.
+
+The lambda calculus is a formal model for computation using only lambda functions.
+Haskell, like other functional languages, is based on the lambda calculus.
+
+The ghc Haskell compiler operates by
+
+  (1) desugaring the source program
+  (2) transforming the program into a version of lambda calculus called System F
+  (3) translating the System F to machine language using graph reduction.
+
+what does the expression consists of?
+
+exp
+  = const
+  | var
+  | exp exp
+  | \ var -> exp
+
+
+Variables
+
+In ∖x -> x+1, the occurrence of x in x+1 is bound by the ∖x. and this is called (bounded occurrence)
+In y∗3, the occurrence or y is free. It must be defined somewhere else, perhaps as a global definition. and this is called (free occurrence)
+
+Free   bounded
+|      |
+a + (\ a -> 2^a) 3
+
+Being free or bound is a property of an occurrence of a variable, not of the variable itself!
+
+
+
+Conversion rules
+
+    Computing in the lambda calculus is performed using three conversion rules.
+
+    The conversion rules allow you to replace an expression by another (“equal”) one.
+
+    Some conversions simplify an expression; these are called reductions.
+
+    (Alpha conversion)
+    Alpha conversion lets you change the name of a function parameter consistently, But be aware you can’t change free variables with alpha conversion!
+    (\x -> x+1) given 3 turns to (\y -> y+1) given 3
+
+    (Beta conversion)
+    Beta conversion is the “workhorse” of lambda calculus: it defines how functions work.
+    take the body of the function, and replace each bound occurrence of the variable with the argument.
+    (\x -> 2*x + g x) given 42 is evaluated as 2∗42+g42
+
+    (Eta conversion)
+    Eta conversion says that a function is equivalent to a lambda expression that takes an argument and applies the function to the argument.
+    (\x -> f x) is equivalent to f
+    (\x -> (*3) x) is equivalent to (∗3)
+
+    There is a common usage of Eta conversion which is removing a common trailing argument.
+    Suppose we have a definition like this:
+    f x y = g y
+
+    This can be rewritten as follows:
+    f = \x -> (\y -> g y)
+    f = \x -> g = f x = g
+
+    Thus the following two definitions are equivalent:
+    f x y = g y
+    f x = g
+
+
+----------------------------
+----------------------------
+----------------------------
+
+Monads
+
+ it is used to describe computations as sequences of steps, and to handle side effects (like exceptions) such as state and IO.
+
+ Monads provide a way to structure a program.
+
+ Definition of a monad
+
+A monad consists of three objects, which must satisfy the monad laws. Let’s look at the objects first:
+
+    A type constructor M, such that for any type a, the type M a is the type of a computation in the monad M that produces a result of type a
+
+    A function return::a -> Ma.
+    Thus if x::a, then return x is a computation in M that, when executed, will produce a value of type a.
+
+    A function (>>=):: M a -> (a -> M b) -> M b, The first argument is a computation that produces a value of type a
+    The second argument is a function that requires an argument of type a and returns a computation that produces a value of type b
+    The result is a computation that will produce a value of type b.
+    It works by running the first computation and passing its result to the function that returns the second computation, which is then executed.
+
+
+They allow to chain a set of functions, it's letterly to take the output of a function and give it to another function and the other function may give the value to another function and so on till we return a result from this monadic blocks
+
+ so if we say that
+ we have a value x and the value needs to be analyzed and the result (M) of type (a) which we could say (M a) is fed to another function (f) that gives a result (M b), but note that (f) may be a monadic operation too :D
+
+ (1)    (2)
+  |      |
+ M a >>= f
+
+ so we can define the sequencing function as follows:
+
+ >>= :: M a -> f -> M b
+is the same as
+ >>= :: M a -> (a -> M b) -> M b
+
+so let's say that we have a function that evaluate a variable (x) and returns the result (M a) and then chain the result to another eval function that evaluates and chain the result to the function f
+
+eval1 x >>= (\n ->
+eval2 n >>= (\m ->
+doSomething m >>= (\i ->
+return i)))
+
+but we are lucky that we have a short handed term in Haskell which is "do"
+
+so we could write the prev monadic block as follows
+
+do
+  n <- eval1 x
+  m <- eval2 n
+  i <- doSomething m
+  return i
+
+so as we are seeing this is much better :D
+every monadic operation finishes and provides the result to the next monadic operation (even if the second monadic operation doesn't need to use the risult of the first one)
+and then to the function f which is doSomething
+and remember that we need to put a return at the end to return the result to be M b
+
+
+The benefits.
+
+supports pure programming languages with effects (such IO, read and write files, exceptions, and reading from environment) so it give us a framework to think about programs that have effects.
+
+It makes it clear where the effects will happen
+
+
+Monads as a type classes
+
+
+there are many instances of monads
+
+
+The Monad type class
+
+    class Monad m where
+        return :: a -> m a
+        (>>=) :: m a -> (a -> m b) -> m b
+        (>>)   :: m a -> m b -> m b
+        fail   :: String -> m a
+
+
+
+
+The return function takes a value and returns a monadic value, i.e. a value wrapped in the monad type constructor.
+
+The >>= operator (pronounced “bind”) is a crucial part of a monad. It binds a value returned from a computation to another computation.
+
+Sometimes the value returned by a computation is unimportant.
+
+The >> operator (pronounced “then”) is like >>=, but it just ignores the value returned by the computation:
+
+m >> n = m >>= \_ -> n
+
+The fail function is used by the system to help produce error messages when there is a pattern that fails to match; normally you don’t use it directly.
+
+
+
+
+The monad laws
+
+Every monad must satisfy the following three laws.
+So if something looks like a monad but does not satisfy these laws,
+it is not a monad! The laws express properties that need to be satisfied in order to make the monadic computations composable.
+
+
+The right unit law:
+
+m >>= return = m
+
+The left unit law:
+
+return x >>= f  = f x
+
+The associativity law:
+
+(m >>= f) >>= g = m >>= (\x -> f x >>= g)
+
+
+
+
+Monad instance of Maybe
+
+import Control.Monad
+
+   instance Monad Maybe where
+       return           =   Just
+       Nothing  >>= f = Nothing
+       (Just x) >>= f = f x
+       fail _           =   Nothing
+
+
+There are a few additional functions defined in the MonadPlus type class but we don't take them in account.
+
+
+
+A computation using explicit Maybe
+
+    foo :: [a] -> Maybe a
+    foo xs =
+      case myTail xs of
+        Nothing -> Nothing
+        Just a -> case myTail a of
+                    Nothing -> Nothing
+                    Just b -> myHead b
+
+To combine computations that use the Maybe type, we need explicit case expressions to pattern match against the type.
+A computation using the Maybe monad
+
+Let’s write this computation using the Maybe monad, first using the >>= operator:
+
+    bar :: [a] -> Maybe a
+    bar xs =
+      myTail xs >>=
+        (\a -> myTail a >>=
+          (\b -> myHead b))
+
+
+          now let's trace bar (the first 1)
+
+
+          bar [5,6,7]
+
+          -- > substitute [5,6,7] for xs in definition of bar
+
+          myTail [5,6,7] >>=
+           (\a -> myTail a >>=
+            (\b -> myHead b))
+
+          -- > def. myTail
+
+          Just [6,7]  >>=
+           (\a -> myTail a >>=
+            (\b -> myHead b))
+
+          -- >  def.2 of (>>=)
+
+           (\a -> myTail a >>=
+            (\b -> myHead b))
+              [6,7]
+          -- > beta reduction, substitute [6,7] for a
+
+           myTail [6,7] >>= (\b -> myHead b)
+
+          -- > reduce myTail
+
+           Just [7] >>=  (\b -> myHead b)
+
+          -- >  def.2 of (>>=)
+
+          (\b -> myHead b) [7]
+
+          -- > beta reduction, substitute [7] for b
+
+          myHead [7]
+
+          -- > def myHead
+
+          Just 7
+
+this example gave us better understanding
+
+Now let’s change the line breaks and indentation a bit to make it look nicer:
+
+    bar2 :: [a] -> Maybe a
+    bar2 xs =
+      myTail xs >>= (\a ->
+      myTail a >>=  (\b ->
+      myHead b))
+
+Thanks to the associativity law, we can also remove unnecessary parentheses:
+
+    bar3 :: [a] -> Maybe a
+    bar3 xs =
+      myTail xs >>= \a ->
+      myTail a >>=  \b ->
+      myHead b
+
+This is already a lot cleaner, but finally we can use the do-notation:
+
+    bar3 :: [a] -> Maybe a
+    bar3 xs = do
+      a <- myTail xs
+      b <- myTail a
+      myHead b
+
+Clearly, the final monadic code is a lot more readable than the original non-monadic code.
+
+
+summery
+
+
+A monad is a mechanism for combining computations. It is a typeclass providing the bind and return operations.
+
+To be an actual monadic type, the implementations of bind and return must conform to the three monad laws.
+
+The Maybe monad illustrates how to create a simple monad and demonstrates its benefits.
