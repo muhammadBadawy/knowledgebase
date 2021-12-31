@@ -6,7 +6,7 @@ I forget a lot, so the best way to keep information is by making summaries about
 
 The hierarchy of the knowledge base
 
-'''
+```
 /
 |__ Software
 |   |_____ Database
@@ -25,4 +25,4 @@ The hierarchy of the knowledge base
 |
 |___ Hardware
 
-'''
+```
