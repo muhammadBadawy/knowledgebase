@@ -12,6 +12,7 @@ The hierarchy of the knowledge base
 |   |_____ Database
 |   |_____ Machine Learning
 |   |        |______ cs229
+|   |        |______ Bayesian Machine Learning
 |   |_____ Programming
 |            |______ functional programming
 |
