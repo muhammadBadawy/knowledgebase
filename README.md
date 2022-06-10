@@ -11,8 +11,22 @@ The hierarchy of the knowledge base
 |__ Software
 |   |_____ Database
 |   |_____ Machine Learning
-|   |        |______ cs229
-|   |        |______ Bayesian Machine Learning
+|   |        |______ Statistical
+|   |        |          |______ Bayesian Machine Learning
+|   |        |          |______ Generalized Linear Models
+|   |        |
+|   |        |______ Neural Networks
+|   |        |          |______ Recurrent Neural Networks
+|   |        |
+|   |        |______ Tool
+|   |        |          |______ AWS
+|   |        |          |______ TensorFlow
+|   |        |
+|   |        |______ Raw Sources
+|   |        |          |______ cs229
+|   |        |
+|   |        |______ Combs for interviews
+|   | 
 |   |_____ Programming
 |            |______ functional programming
 |
